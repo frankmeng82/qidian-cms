@@ -123,7 +123,7 @@ chmod +x /usr/local/bin/docker-compose
 ```bash
 # 方式1: Git克隆
 cd /www/wwwroot
-git clone https://github.com/your-repo/qidian-cms.git
+git clone https://github.com/frankmeng82/qidian-cms.git
 
 # 方式2: 上传压缩包
 # 宝塔文件管理器 → 上传 → 解压
