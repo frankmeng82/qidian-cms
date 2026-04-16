@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  test-db:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_DB: qidian_test
+      POSTGRES_USER: test
+      POSTGRES_PASSWORD: test
+    ports:
+      - '5433:5432'
+
+  test-redis:
+    image: redis:7-alpine
+    ports:
+      - '6380:6379'
+
+  test-app:
+    build:
+      context: .
+      dockerfile: apps/backend/Dockerfile
+    environment:
+      NODE_ENV: test
+      PORT: 3000
+      DATABASE_URL: postgresql://test:test@test-db:5432/qidian_test?schema=public
+      REDIS_URL: redis://test-redis:6379
+      JWT_SECRET: test_secret_123456
+      JWT_EXPIRES_IN: 7d
+    depends_on:
+      - test-db
+      - test-redis

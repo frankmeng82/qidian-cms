@@ -1,0 +1,173 @@
+openapi: 3.0.3
+info:
+  title: Qidian CMS API
+  version: 0.1.0
+  description: 奇点影视 CMS 核心 API 定义（阶段性）
+servers:
+  - url: http://localhost:3000/api/v1
+paths:
+  /auth/register:
+    post:
+      summary: 用户注册
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, username, password]
+              properties:
+                email: { type: string, format: email }
+                username: { type: string }
+                password: { type: string }
+      responses:
+        '201':
+          description: created
+  /auth/login:
+    post:
+      summary: 用户登录
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password]
+              properties:
+                email: { type: string }
+                password: { type: string }
+      responses:
+        '200':
+          description: ok
+  /videos:
+    get:
+      summary: 视频列表
+      parameters:
+        - in: query
+          name: page
+          schema: { type: integer, default: 1 }
+        - in: query
+          name: pageSize
+          schema: { type: integer, default: 10 }
+        - in: query
+          name: keyword
+          schema: { type: string }
+      responses:
+        '200':
+          description: ok
+    post:
+      summary: 创建视频（管理员）
+      security:
+        - bearerAuth: []
+      responses:
+        '201':
+          description: created
+  /videos/{id}:
+    get:
+      summary: 视频详情
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          description: ok
+    put:
+      summary: 更新视频（管理员）
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          description: ok
+    delete:
+      summary: 删除视频（软删，管理员）
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '204':
+          description: no content
+  /videos/{id}/play:
+    get:
+      summary: 获取播放线路和分集
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          description: ok
+  /videos/{id}/progress:
+    post:
+      summary: 上报播放进度
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '204':
+          description: no content
+  /categories:
+    get:
+      summary: 分类树列表
+      responses:
+        '200':
+          description: ok
+    post:
+      summary: 创建分类（管理员）
+      security:
+        - bearerAuth: []
+      responses:
+        '201':
+          description: created
+  /collect/rules:
+    get:
+      summary: 采集规则列表（管理员）
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: ok
+    post:
+      summary: 创建采集规则（管理员）
+      security:
+        - bearerAuth: []
+      responses:
+        '201':
+          description: created
+  /collect/execute:
+    post:
+      summary: 执行采集任务（管理员）
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: queued
+  /collect/logs:
+    get:
+      summary: 采集日志（管理员）
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: ok
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

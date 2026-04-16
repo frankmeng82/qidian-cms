@@ -1,0 +1,46 @@
+{
+  "name": "qidian-cms",
+  "private": true,
+  "version": "0.1.0",
+  "workspaces": [
+    "apps/*"
+  ],
+  "scripts": {
+    "dev": "npm run dev --workspace @qidian-cms/backend & npm run dev --workspace @qidian-cms/frontend",
+    "dev:frontend": "npm run dev --workspace @qidian-cms/frontend",
+    "dev:backend": "npm run dev --workspace @qidian-cms/backend",
+    "dev:test": "concurrently -k -s first \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "build": "npm run build --workspace @qidian-cms/backend && npm run build --workspace @qidian-cms/frontend",
+    "lint": "npm run lint --workspace @qidian-cms/backend && npm run lint --workspace @qidian-cms/frontend",
+    "test": "npm run test:unit && npm run test:api",
+    "test:unit": "npm run test --workspace @qidian-cms/backend && npm run test --workspace @qidian-cms/frontend",
+    "test:integration": "npm run test:api && npm run test:e2e",
+    "test:api": "npm run test:api --workspace @qidian-cms/backend",
+    "test:api:real": "npm run test:api:real --workspace @qidian-cms/backend",
+    "test:e2e": "playwright test --project=chromium",
+    "test:e2e:smoke": "playwright test tests/e2e/auth-flow.spec.ts tests/e2e/public-flow.spec.ts tests/e2e/admin-flow.spec.ts tests/e2e/full-chain.spec.ts --project=chromium",
+    "test:e2e:ci": "npm run test:e2e:smoke",
+    "test:e2e:all": "playwright test",
+    "test:e2e:headed": "playwright test --headed",
+    "test:e2e:real": "E2E_REAL=true playwright test tests/e2e/full-chain.spec.ts --project=chromium",
+    "test:coverage": "npm run test:coverage --workspace @qidian-cms/backend && npm run test:coverage --workspace @qidian-cms/frontend",
+    "test:perf": "k6 run tests/performance/videos-api.k6.js",
+    "test:security": "npm run test:security --workspace @qidian-cms/backend",
+    "format": "prettier --write ."
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.1",
+    "@typescript-eslint/eslint-plugin": "^8.31.1",
+    "@typescript-eslint/parser": "^8.31.1",
+    "eslint": "^9.25.1",
+    "eslint-config-prettier": "^10.1.2",
+    "eslint-plugin-import": "^2.31.0",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^5.2.0",
+    "globals": "^16.4.0",
+    "@playwright/test": "^1.55.0",
+    "concurrently": "^9.2.1",
+    "prettier": "^3.5.3",
+    "typescript": "^5.8.3"
+  }
+}
