@@ -82,10 +82,15 @@ async function promoteUserToAdmin(email: string) {
   const { PrismaClient } = await import('@prisma/client');
   const prisma = new PrismaClient();
   try {
-    await prisma.user.update({
-      where: { email },
-      data: { role: 'ADMIN' },
-    });
+    for (let attempt = 0; attempt < 10; attempt += 1) {
+      const result = await prisma.user.updateMany({
+        where: { email },
+        data: { role: 'ADMIN' },
+      });
+      if (result.count > 0) return;
+      await new Promise((resolve) => setTimeout(resolve, 300));
+    }
+    throw new Error(`failed to promote user to admin: ${email}`);
   } finally {
     await prisma.$disconnect();
   }
