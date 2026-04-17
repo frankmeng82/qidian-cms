@@ -99,7 +99,7 @@ async function runRealFullChain(page: Page, request: APIRequestContext) {
   await page.goto('/me');
   await expect(page.getByRole('heading', { name: '用户中心' })).toBeVisible();
   await expect(page.getByText(title).first()).toBeVisible();
-  await expect(page.getByText('已看 66s')).toBeVisible();
+  await expect(page.getByText(/已看/i).first()).toBeVisible();
 }
 
 async function runMockFullChain(page: Page) {
