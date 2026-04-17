@@ -76,6 +76,7 @@ export async function registerAndLogin(page: Page, user: TestUser) {
   await page.getByPlaceholder('admin@example.com').fill(user.email);
   await page.getByPlaceholder('请输入密码').fill(user.password);
   await page.locator('form').getByRole('button', { name: /登\s*录|log\s*in/i }).click();
+  await expect(page).toHaveURL(/\/$/);
 }
 
 async function promoteUserToAdmin(email: string) {
@@ -98,8 +99,10 @@ async function promoteUserToAdmin(email: string) {
 
 export async function createVideoFromAdmin(page: Page, title: string): Promise<string> {
   await page.goto('/admin/videos/new');
-  await page.getByPlaceholder('请输入视频标题').fill(title);
-  await page.getByRole('button', { name: '创建视频' }).click();
+  await expect(page).toHaveURL(/\/admin\/videos\/new/);
+  await expect(page.getByRole('heading', { name: '添加视频' })).toBeVisible();
+  await page.getByLabel('标题').fill(title);
+  await page.getByRole('button', { name: /创\s*建\s*视\s*频/i }).click();
   await expect(page).toHaveURL('/admin/videos');
   await expect(page.getByText(title)).toBeVisible();
 
