@@ -64,15 +64,17 @@ export function createRealE2EUser(): TestUser {
 
 export async function registerAndLogin(page: Page, user: TestUser) {
   await page.goto('/register');
+  await expect(page.getByRole('heading', { name: '奇点影视CMS 注册' })).toBeVisible();
   await page.getByPlaceholder('user@example.com').fill(user.email);
   await page.getByPlaceholder('请输入用户名').fill(user.username);
   await page.getByPlaceholder('至少8位，包含字母+数字').fill(user.password);
-  await page.getByRole('button', { name: '注册' }).click();
+  await page.locator('form').getByRole('button', { name: /注\s*册|register/i }).click();
 
   await expect(page).toHaveURL(/\/login/);
+  await expect(page.getByRole('heading', { name: '奇点影视CMS 登录' })).toBeVisible();
   await page.getByPlaceholder('admin@example.com').fill(user.email);
   await page.getByPlaceholder('请输入密码').fill(user.password);
-  await page.getByRole('button', { name: '登录' }).click();
+  await page.locator('form').getByRole('button', { name: /登\s*录|log\s*in/i }).click();
 }
 
 export async function createVideoFromAdmin(page: Page, title: string): Promise<string> {
