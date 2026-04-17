@@ -104,10 +104,10 @@ export async function createVideoFromAdmin(page: Page, title: string): Promise<s
   await page.getByLabel('标题').fill(title);
   await page.getByRole('button', { name: /创\s*建\s*视\s*频/i }).click();
   await expect(page).toHaveURL('/admin/videos');
-  await expect(page.getByText(title)).toBeVisible();
+  await expect(page.getByRole('cell', { name: title }).first()).toBeVisible();
 
   const detailRow = page.locator('tr', { hasText: title }).first();
-  await detailRow.getByRole('button', { name: '详情' }).click();
+  await detailRow.getByRole('button', { name: /详\s*情/i }).click();
   await expect(page).toHaveURL(/\/admin\/videos\/.+/);
 
   const match = page.url().match(/\/admin\/videos\/([^/]+)/);
