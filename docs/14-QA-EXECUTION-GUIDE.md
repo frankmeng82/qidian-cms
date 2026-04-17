@@ -79,6 +79,13 @@ npx prisma db push --schema apps/backend/prisma/schema.prisma
 npm run test:e2e:real
 ```
 
+GitHub Actions 一键触发（推荐做回归留痕）：
+
+```bash
+gh workflow run "E2E Real Full Chain" --ref main
+gh run watch $(gh run list --workflow "E2E Real Full Chain" --limit 1 --json databaseId --jq '.[0].databaseId') --exit-status
+```
+
 ## 5. 覆盖率报告
 
 - 后端/前端均启用 coverage 报告输出（html + text）
