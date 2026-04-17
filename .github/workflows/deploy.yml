@@ -7,18 +7,34 @@ on:
 
 jobs:
   deploy:
-    if: ${{ secrets.SSH_PRIVATE_KEY != '' && secrets.SERVER_HOST != '' && secrets.SERVER_USER != '' && secrets.PROJECT_DIR != '' }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Check required deployment secrets
+        id: check_secrets
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          SERVER_HOST: ${{ secrets.SERVER_HOST }}
+          SERVER_USER: ${{ secrets.SERVER_USER }}
+          PROJECT_DIR: ${{ secrets.PROJECT_DIR }}
+        run: |
+          if [ -n "$SSH_PRIVATE_KEY" ] && [ -n "$SERVER_HOST" ] && [ -n "$SERVER_USER" ] && [ -n "$PROJECT_DIR" ]; then
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+            echo "Missing one or more deployment secrets; skipping deploy steps."
+          fi
+
       - name: Setup SSH
+        if: steps.check_secrets.outputs.ready == 'true'
         uses: webfactory/ssh-agent@v0.9.0
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
       - name: Deploy to Server
+        if: steps.check_secrets.outputs.ready == 'true'
         env:
           HOST: ${{ secrets.SERVER_HOST }}
           USER: ${{ secrets.SERVER_USER }}
@@ -35,7 +51,11 @@ jobs:
           REMOTE_SCRIPT
 
       - name: Notify Success
-        if: success()
+        if: success() && steps.check_secrets.outputs.ready == 'true'
         run: |
           echo "部署成功!"
           # 可以添加钉钉/企业微信通知
+
+      - name: Notify Skipped
+        if: steps.check_secrets.outputs.ready != 'true'
+        run: echo "部署已跳过：未配置完整部署 secrets。"
