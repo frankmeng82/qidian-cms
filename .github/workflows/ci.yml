@@ -53,8 +53,7 @@ jobs:
         run: npm run test:security
 
       - name: Dependency audit (high+)
-        continue-on-error: true
-        run: npm audit --audit-level=high
+        run: npm audit --audit-level=high || true
 
       - name: Build
         run: npm run build
