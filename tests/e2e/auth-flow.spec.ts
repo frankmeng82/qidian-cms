@@ -15,7 +15,8 @@ test.describe('Auth flow', () => {
   test('login form validation blocks empty submit', async ({ page }) => {
     const authPage = new AuthPage(page);
     await authPage.gotoLogin();
-    await page.getByRole('button', { name: '登录' }).click();
+    await expect(page.getByRole('heading', { name: '奇点影视CMS 登录' })).toBeVisible();
+    await page.locator('form').getByRole('button', { name: /登\s*录|log\s*in/i }).click();
     await expect(page.getByText('请输入邮箱')).toBeVisible();
     await expect(page.getByText('请输入密码')).toBeVisible();
   });
@@ -26,9 +27,10 @@ test.describe('Auth flow', () => {
 
     const authPage = new AuthPage(page);
     await authPage.gotoLogin();
+    await expect(page.getByRole('heading', { name: '奇点影视CMS 登录' })).toBeVisible();
     await page.getByPlaceholder('admin@example.com').fill('e2e@example.com');
     await page.getByPlaceholder('请输入密码').fill('abc12345');
-    await page.getByRole('button', { name: '登录' }).click();
+    await page.locator('form').getByRole('button', { name: /登\s*录|log\s*in/i }).click();
 
     await expect(page).toHaveURL('/');
     await expect(page.getByRole('heading', { name: '奇点影视' })).toBeVisible();

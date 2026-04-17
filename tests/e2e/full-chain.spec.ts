@@ -38,7 +38,7 @@ test.describe('Core end-to-end chains', () => {
     await setupMockAdminVideoListRoute(page);
 
     await page.goto('/admin/videos');
-    await expect(page.getByText('视频管理')).toBeVisible();
+    await expect(page.getByRole('heading', { name: '视频管理' })).toBeVisible();
     await expect(page.getByText('测试视频')).toBeVisible();
   });
 
@@ -49,9 +49,9 @@ test.describe('Core end-to-end chains', () => {
 
     await page.goto('/video/video-1');
     await expect(page.getByRole('heading', { name: '测试片' })).toBeVisible();
-    await page.getByRole('button', { name: '立即播放' }).click();
+    await page.getByRole('button', { name: /立\s*即\s*播\s*放/i }).click();
     await expect(page).toHaveURL(/\/play\/video-1/);
-    await expect(page.getByText('线路1')).toBeVisible();
+    await expect(page.locator('select').first()).toContainText('线路1');
   });
 
   test('unauthenticated user is redirected from protected routes', async ({ page }) => {
@@ -72,7 +72,7 @@ test.describe('Core end-to-end chains', () => {
 
     await page.goto(`/video/${state.video.id}`);
     await expect(page.getByRole('heading', { name: state.video.title })).toBeVisible();
-    await page.getByRole('button', { name: '收藏' }).click();
+    await page.getByRole('button', { name: /收\s*藏/i }).first().click();
     await expect(page.getByText('收藏失败，请先登录')).toBeVisible();
   });
 });
@@ -89,15 +89,15 @@ async function runRealFullChain(page: Page, request: APIRequestContext) {
 
   await page.goto(`/video/${targetVideoId}`);
   await expect(page.getByRole('heading', { name: title })).toBeVisible();
-  await page.getByRole('button', { name: '收藏' }).click();
-  await page.getByRole('button', { name: '立即播放' }).click();
+  await page.getByRole('button', { name: /收\s*藏/i }).first().click();
+  await page.getByRole('button', { name: /立\s*即\s*播\s*放/i }).click();
   await expect(page).toHaveURL(new RegExp(`/play/${targetVideoId}`));
-  await expect(page.getByText('线路1')).toBeVisible();
+  await expect(page.locator('select').first()).toContainText('线路1');
 
   await reportProgressByStoredToken(page, request, targetVideoId, 66);
 
   await page.goto('/me');
-  await expect(page.getByText('用户中心')).toBeVisible();
+  await expect(page.getByRole('heading', { name: '用户中心' })).toBeVisible();
   await expect(page.getByText(title).first()).toBeVisible();
   await expect(page.getByText('已看 66s')).toBeVisible();
 }
@@ -107,28 +107,30 @@ async function runMockFullChain(page: Page) {
   await setupMockFullChainRoutes(page, state);
 
   await page.goto('/register');
+  await expect(page.getByRole('heading', { name: '奇点影视CMS 注册' })).toBeVisible();
   await page.getByPlaceholder('user@example.com').fill('e2e@example.com');
   await page.getByPlaceholder('请输入用户名').fill(state.username);
   await page.getByPlaceholder('至少8位，包含字母+数字').fill('abc12345');
-  await page.getByRole('button', { name: '注册' }).click();
+  await page.locator('form').getByRole('button', { name: /注\s*册|register/i }).click();
 
+  await expect(page.getByRole('heading', { name: '奇点影视CMS 登录' })).toBeVisible();
   await page.getByPlaceholder('admin@example.com').fill('e2e@example.com');
   await page.getByPlaceholder('请输入密码').fill('abc12345');
-  await page.getByRole('button', { name: '登录' }).click();
+  await page.locator('form').getByRole('button', { name: /登\s*录|log\s*in/i }).click();
 
   await page.goto('/admin/videos/new');
   await page.getByPlaceholder('请输入视频标题').fill(state.video.title);
-  await page.getByRole('button', { name: '创建视频' }).click();
+  await page.getByRole('button', { name: /创\s*建\s*视\s*频/i }).click();
 
   await page.goto(`/video/${state.video.id}`);
-  await page.getByRole('button', { name: '立即播放' }).click();
+  await page.getByRole('button', { name: /立\s*即\s*播\s*放/i }).click();
   await expect(page).toHaveURL(new RegExp(`/play/${state.video.id}`));
 
   await page.goto(`/video/${state.video.id}`);
-  await page.getByRole('button', { name: '收藏' }).click();
+  await page.getByRole('button', { name: /收\s*藏/i }).first().click();
 
   await page.goto('/me');
-  await expect(page.getByText('用户中心')).toBeVisible();
+  await expect(page.getByRole('heading', { name: '用户中心' })).toBeVisible();
   await expect(page.getByText(state.video.title).first()).toBeVisible();
 }
 

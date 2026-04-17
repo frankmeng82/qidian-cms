@@ -7,6 +7,7 @@ on:
 
 jobs:
   deploy:
+    if: ${{ secrets.SSH_PRIVATE_KEY != '' && secrets.SERVER_HOST != '' && secrets.SERVER_USER != '' && secrets.PROJECT_DIR != '' }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
