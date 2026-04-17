@@ -82,8 +82,14 @@ npm run test:e2e:real
 GitHub Actions 一键触发（推荐做回归留痕）：
 
 ```bash
-gh workflow run "E2E Real Full Chain" --ref main
-gh run watch $(gh run list --workflow "E2E Real Full Chain" --limit 1 --json databaseId --jq '.[0].databaseId') --exit-status
+npm run qa:real:remote
+```
+
+可选拆分命令：
+
+```bash
+npm run qa:real:dispatch
+npm run qa:real:watch
 ```
 
 ## 5. 覆盖率报告

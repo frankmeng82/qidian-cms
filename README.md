@@ -67,9 +67,9 @@ npm run test
 - E2E 快速门禁：`npm run test:e2e:smoke`（Playwright Chromium）
 - E2E 全量：`npm run test:e2e`（Playwright Chromium）
 - E2E 真实链路：`npm run test:e2e:real`（需 `E2E_REAL=true` + PostgreSQL/Redis）
-- 远程触发真实链路（GitHub Actions）：
-  - `gh workflow run "E2E Real Full Chain" --ref main`
-  - `gh run watch $(gh run list --workflow "E2E Real Full Chain" --limit 1 --json databaseId --jq '.[0].databaseId') --exit-status`
+- 远程触发真实链路（GitHub Actions）：`npm run qa:real:remote`
+- 仅触发不等待：`npm run qa:real:dispatch`
+- 仅跟踪最近一次 real E2E：`npm run qa:real:watch`
 - 性能：`npm run test:perf`（k6）
 - 安全冒烟：`npm run test:security`
 - CI：`.github/workflows/ci.yml` 执行 `lint + unit + api + e2e-smoke + build`，并在 `main/schedule` 运行全量 E2E
