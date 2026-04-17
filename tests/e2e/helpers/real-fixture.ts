@@ -70,11 +70,25 @@ export async function registerAndLogin(page: Page, user: TestUser) {
   await page.getByPlaceholder('至少8位，包含字母+数字').fill(user.password);
   await page.locator('form').getByRole('button', { name: /注\s*册|register/i }).click();
 
+  await promoteUserToAdmin(user.email);
   await expect(page).toHaveURL(/\/login/);
   await expect(page.getByRole('heading', { name: '奇点影视CMS 登录' })).toBeVisible();
   await page.getByPlaceholder('admin@example.com').fill(user.email);
   await page.getByPlaceholder('请输入密码').fill(user.password);
   await page.locator('form').getByRole('button', { name: /登\s*录|log\s*in/i }).click();
+}
+
+async function promoteUserToAdmin(email: string) {
+  const { PrismaClient } = await import('@prisma/client');
+  const prisma = new PrismaClient();
+  try {
+    await prisma.user.update({
+      where: { email },
+      data: { role: 'ADMIN' },
+    });
+  } finally {
+    await prisma.$disconnect();
+  }
 }
 
 export async function createVideoFromAdmin(page: Page, title: string): Promise<string> {
