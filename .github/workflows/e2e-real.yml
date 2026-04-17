@@ -1,0 +1,72 @@
+name: E2E Real Full Chain
+
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: e2e-real-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  e2e-chromium-real:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:15-alpine
+        env:
+          POSTGRES_DB: qidian_test
+          POSTGRES_USER: test
+          POSTGRES_PASSWORD: test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U test -d qidian_test"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+    env:
+      E2E_REAL: 'true'
+      DATABASE_URL: postgresql://test:test@localhost:5432/qidian_test?schema=public
+      REDIS_URL: redis://localhost:6379
+      JWT_SECRET: test_secret_123456
+      JWT_EXPIRES_IN: 7d
+      NODE_ENV: test
+      PORT: 3000
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Prepare backend env
+        run: cp apps/backend/.env.example apps/backend/.env
+
+      - name: Push test schema
+        run: npx prisma db push --schema apps/backend/prisma/schema.prisma
+
+      - name: Generate Prisma client
+        run: npm run prisma:generate --workspace @qidian-cms/backend
+
+      - name: Install Playwright Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Run real full-chain E2E
+        run: npm run test:e2e:real
+
+      - name: Upload Playwright report (real)
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: playwright-report-real
+          path: playwright-report

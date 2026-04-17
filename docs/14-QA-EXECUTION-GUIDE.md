@@ -100,7 +100,9 @@ npm run test:perf
 
 ## 7. CI 自动化
 
-- 工作流：`.github/workflows/ci.yml`
+- 工作流：
+  - `.github/workflows/ci.yml`（常规 CI）
+  - `.github/workflows/e2e-real.yml`（手动真实全链路）
 - 包含：
   - lint
   - unit test
@@ -112,5 +114,5 @@ npm run test:perf
   - api integration (real db)
   - e2e smoke (chromium, push/PR 快速门禁)
   - e2e chromium（仅 main 分支 + schedule 全量回归）
-  - e2e chromium real（workflow_dispatch 可选触发）
+  - e2e chromium real（独立 `E2E Real Full Chain` 工作流手动触发）
   - artifact 上传（coverage + playwright report）
